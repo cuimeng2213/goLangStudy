@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 type Item struct {
@@ -68,6 +69,7 @@ func callWorker(n int, numChan chan *Item, sumChan chan *Result) {
 func printResult(sumChan chan *Result) {
 	for ret := range sumChan {
 		fmt.Printf(">>>: ret= sum=%d id=%d number=%d\n", ret.sum, ret.item.id, ret.item.number)
+		time.Sleep(time.Second)
 	}
 }
 
@@ -75,9 +77,29 @@ func main() {
 	numChan = make(chan *Item, 100)
 	sumChan = make(chan *Result, 100)
 
+	exitChan := make(chan struct{}, 1)
+
 	go Producer(numChan)
 	callWorker(20, numChan, sumChan)
 
-	printResult(sumChan)
+	go printResult(sumChan)
 
+	//开一个读取标准输入得匿名函数协程
+	go func(ch chan struct{}) {
+		for {
+			b := make([]byte, 1)
+			fmt.Printf("等待任意字符退出\n")
+			fmt.Scan(&b)
+			ch <- struct{}{}
+		}
+	}(exitChan)
+
+	for {
+		select {
+		case <-exitChan:
+			fmt.Println(">>>>>>>>>>>>>>>>>>> tuichule")
+			// 此处break只能退出select语句块， 若要退出for循环则使用return
+			return
+		}
+	}
 }
