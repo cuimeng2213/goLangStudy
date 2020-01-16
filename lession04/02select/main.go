@@ -15,7 +15,11 @@ type Result struct {
 	item *Item
 	sum  int64
 }
+type Exit struct {
+	cmd string
+}
 
+// 通道中最好使用引用类型，减少由于值类型赋值操作产生的内存浪费
 var numChan chan *Item
 var sumChan chan *Result
 
@@ -77,7 +81,7 @@ func main() {
 	numChan = make(chan *Item, 100)
 	sumChan = make(chan *Result, 100)
 
-	exitChan := make(chan struct{}, 1)
+	exitChan := make(chan *Exit, 1)
 
 	go Producer(numChan)
 	callWorker(20, numChan, sumChan)
@@ -85,19 +89,22 @@ func main() {
 	go printResult(sumChan)
 
 	//开一个读取标准输入得匿名函数协程
-	go func(ch chan struct{}) {
+	go func(ch chan *Exit) {
 		for {
 			b := make([]byte, 1)
 			fmt.Printf("等待任意字符退出\n")
+
 			fmt.Scan(&b)
-			ch <- struct{}{}
+			e := &Exit{cmd: string(b)}
+			fmt.Printf("exit= %p \n", e)
+			ch <- e
 		}
 	}(exitChan)
 
 	for {
 		select {
-		case <-exitChan:
-			fmt.Println(">>>>>>>>>>>>>>>>>>> tuichule")
+		case ret := <-exitChan:
+			fmt.Printf(">>>>>>>>>>>>>>>>>>> tuichule exit=%p %s\n", ret, ret.cmd) // 使用引用传递此处获取的地址 与传入通道时一样。
 			// 此处break只能退出select语句块， 若要退出for循环则使用return
 			return
 		}
