@@ -505,7 +505,7 @@ defer：运行机制
 
 ​		defer在panic之前执行
 
-![1579144829751](C:\Users\Administrator\go\src\goLangStudy\noteBook\assets\1579144829751.png)
+![1579144829751](.\assets\1579144829751.png)
 
 ​	多用于资源释放。比如：关闭文件句柄，socket、
 
@@ -724,7 +724,7 @@ panic和recover  用来做错误处理
 
 #### 作业：
 
-![1579168393567](C:\Users\Administrator\go\src\goLangStudy\noteBook\assets\1579168393567.png)
+![1579168393567](.\assets\1579168393567.png)
 
 ```
 var (
