@@ -732,14 +732,199 @@ var (
 	users = []string{
         "Matthew","Sarah"
 	}
-	dispatchbution = make(map[string]int, len(users))
+	dispatchcoin = make(map[string]int, len(users))
 )
 // 思路
-func DispatchCoins(){
-    
+func DispatchCoins()(left int){
+    //1.拿到每个人的名
+    for _, name := range users{
+    	//2.拿到一个人根据分金币规则分金币
+    	for _,c := range name{
+    		switch c {
+    			case 'e','E':
+    				dispatchcoin[name]++
+    				coins --
+    			case 'i','I':
+    				dispatchcoin[name]+=2
+    				coins -=2
+    			case 'o','O':
+    				dispatchcoin[name]+=3
+    				cpons-=3
+    			case 'u','U':
+    				dispatchcoin[name]+=4
+    				coins-=4
+    		}
+    	}
+    }
+    left = coins
+    return
 }
 func main(){
-    
+    DispatchCoins()
 }
 ```
+
+## 递归
+
+函数自己调用自己
+
+```
+// 递归
+//阶乘： 5！ = 5*4*3*2*1 4!=4*3*2*1
+//计算n的阶乘
+func f(n int64) int64 {
+	if n >1 {
+		return n * f(n-1)
+	} else {
+		return 1
+	}
+	
+}
+```
+
+n个台阶，一个可以走1步，也可以一次都两步，有多少种走法
+
+```
+func taijie(n uint64) uint64{
+	if n == 1{
+		return 1
+	} else if n == 2 {
+		return 2
+	} else {
+		return taijie(n-1)+taijie(n-2)
+	}
+}
+```
+
+## 自定义类型
+
+```
+// 自定义类型和别名
+
+// type后面跟的是类型
+type myInt int
+
+//类型别名
+//它只是原来类型的另外一个叫法不是新的类型
+type yourInt = int
+
+func main(){
+	var n myInt
+	n =100
+	fmt.Printf("%d\n", n)
+	fmt.Printf("%T\n", n) // main.myInt
+	
+	var m yourInt
+	m =100
+	fmt.Println(m)
+	fmt.Printf("%T\n", m) // int
+}
+```
+
+## 结构体
+
+​		结构体是值类型
+
+```
+type 类型名 struct {
+	字段名 字段类型
+	字段名 字段类型
+	。。。
+}
+// 结构体
+type Person struct {
+	name string
+	age int
+	hobby []string
+}
+func main(){
+	var zhou Person
+	zhou.name = "lucy"
+	zhou.age = 100
+	zhou.hobby = []string{"baskBall","football"}
+	
+	//匿名结构体
+	var s struct{
+		address string
+		age int
+	}
+	
+	//结构体指针
+	var p = new(Person)
+	p.name = "p"
+	fmt.Printf("%T %v %p",p,p,&p)
+	//key-value初始化
+	var p1 = Person{
+		name:"haha",
+		age:12,
+		hobby:[]string{"111","222"},
+	}
+}
+```
+
+#### 结构体内存布局
+
+结构体内的数据占用的内存是一块连续的内存。
+
+```
+type A {
+	a int8
+	b int8
+	c int8
+}
+func main(){
+	aa := A{
+		a:10,
+		b:20,
+		c:30,
+	}
+	fmt.Printf("a:%p \n", &aa.a)
+	fmt.Printf("b:%p \n", &aa.b)
+	fmt.Printf("b:%p \n", &aa.c)
+	
+}
+
+```
+
+结构体初始化：
+
+```
+//构造函数初始化结构体返回 结构体 还是结构体指针？？？
+//由于结构体是值类型，如果赋值时都是拷贝。会加大内存占用
+//所以一般情况下均返回结构体指针。
+func NewA() A {
+	return A{
+		a:1,
+		b:2,
+		c:3,
+	}
+}
+```
+
+#### 方法和接收者
+
+​	Go语言中的方法是一种作用于特定类型的函数
+
+```
+type Dog struct {
+	name string
+}
+
+func NewDog(name string) *Dog{
+	return &Dog{
+		name:name,
+	}
+}
+//接收者写在函数名字前面
+func (d Dong)wang(){
+	fmt.Println(d.name,"wangwang")
+}
+func main(){
+	d := NewDog()
+	d.wang()
+}
+
+```
+
+#### 值接受者和指针接受者区别
 
