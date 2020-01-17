@@ -724,7 +724,7 @@ panic和recover  用来做错误处理
 
 #### 作业：
 
-![1579168393567](.\assets\1579168393567.png)
+![1579168393567](./assets/1579168393567.png)
 
 ```
 var (
@@ -927,4 +927,142 @@ func main(){
 ```
 
 #### 值接受者和指针接受者区别
+
+如果结构体内部字段为值类型，则需要修改该字段时值接收者不会修改。
+
+```
+type Person struct{
+    Age int
+    Name string
+}
+func (p Person)ageGrow(){
+    p.Age++
+}
+func (p *Person)ageTrueGrow(){
+    p.Age++
+}
+func main(){
+    p := Person{
+        Age:18,
+        Name:"hehe",
+    }
+    fmt.Println(p.Age) // 18
+    p.ageGrow() // p.Age = 18 值接收者不会改变Age值
+    p.ageTrueGrow() // p.Age = 19
+}
+```
+
+#### 结构体匿名字段
+
+```
+package main
+import (
+	"fmt"
+)
+//type Person struct{
+//    name string
+//    age int
+//}
+
+//匿名字段
+type Person struct{
+    string
+    int
+}
+
+func main(){
+ 	p := Person{
+        "hehe",
+        12
+ 	}   
+ 	// 直接将类型当成字段名字
+ 	fmt.Println(p.string)
+}
+```
+
+匿名嵌套结构体
+
+```
+type address struct{
+    city string
+    province string
+}
+type people struct{
+    address		//使用address作为匿名字段
+    name string
+    age int
+}
+type conpany struct{
+    address
+    name string
+}
+```
+
+结构体的继承：
+
+```
+//继承
+//结构体模拟实现其他语言的“继承”
+type animal struct{
+    name string
+}
+// 给animal实现一个移动方法
+func (a animal)move(){
+    fmt.Println(a.name," is moving")
+}
+type dog struct{
+	feet uint8    
+	animal		//animal拥有的方法，dog此时也有了。
+}
+//给dog实现一个wang方法
+func (d dong) wang(){
+    fmt.Println(d.name," wang...")
+}
+func main(){
+    d1 := dog{
+        feet:4,
+        animal:animal{
+            name:"xiaohei",
+        }
+    }
+    fmt.Println(d1)
+    d1.wang()
+    d1.move()// 是否可执行?  ---可以执行的-_-.
+}
+```
+
+#### 结构体与JSON
+
+​	如何将结构体转换成json数据格式
+
+```
+// 结构体与json
+//1. 将Go语言的结构体变脸 转换成 json格式的字符串
+//2. 将json格式的字符串 --》 Go语言能够识别的结构体变量
+import(
+	"encoding/json"
+)
+//1.结构体支持json序列化，需要将字段开头字母大写-- 外部包可见
+type person struct{
+    Name string	`json:name`   //使用元信息
+    Age int		`json:age`
+}
+func main(){
+    p1 := person{
+        name:"xiaohei",
+        age:22,
+    }
+    json0, err := json.Marshal(p1)
+    if err!=nil{
+        fmt.Println("marshal failed", err)
+        return
+    }
+    fmt.Printf("%s\n", string(json0))
+    //反序列化
+    s := `{"name":"xiaoheihei","age":12}`
+    var p2 person
+    json.Unmarshal([]byte(s), &p2)
+    fmt.Printf("p2=%v\n",p2)
+}
+```
 
