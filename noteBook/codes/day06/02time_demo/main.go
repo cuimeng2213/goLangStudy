@@ -27,12 +27,13 @@ func main() {
 	fmt.Println(t.Format("2006/01/02 15:04:05.9999"))
 
 	//按照对应时间格式解析字符串类型的时间
-	timeObj, err := time.Parse("2006-01-02", "2010-10-03")
+	timeObj, err := time.Parse("2006-01-02 15:04:05", "2020-01-19 12:30:22")
 	if err != nil {
 		fmt.Println("Parse failed")
 		return
 	}
 	fmt.Println(timeObj)
 	fmt.Println(timeObj.Unix())
+	fmt.Println(timeObj.Local().Sub(t.Local()))
 	timer()
 }

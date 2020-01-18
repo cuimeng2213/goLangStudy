@@ -145,6 +145,34 @@ Go语言时间格式比较特殊：
 
 ​	2006-01-02    15：04：05
 
+```
+//时区
+func f2(){
+	now := time.Now() // 本地时间
+	fmt.Println(now)
+	
+	// 获取明天这个时间
+	time.Parse("2006-01-02 15:04:05", "2020-01-19 07:11:22")
+	/按照东八区和合格式解析一个字符串
+	loc, err := time.LoadLocation("Asia/Shanghai")
+	if err!= nil {
+		fmt.Println("load location failed")
+		return
+	}
+	tobj, err := time.ParseInLocation("2006-01-02 15:04:05", "2020-01-19 07:11:22", loc)
+	if err != nil{
+		return
+	}
+	fmt.Println(tobj)
+}
+
+func main() {
+	f2()
+}
+```
+
+
+
 ### 日志库
 
 ### 反射
