@@ -178,6 +178,7 @@ func main() {
 ##### 需求分析：
 
 1. 支持往不同得地方输出日志
+
 2. 日志分级别
    - Debug
    - Trace
@@ -187,8 +188,56 @@ func main() {
    - Fatal
 
 3. 日志要支持开关控制。比如说开发的时候什么级别都能输出，但是上线之后只有Info以上得级别可以输出。
+
 4. 完整的日志要包含时间戳、行号、文件名、日志级别、日志inxi
+
 5. 日志文件要实现切割
+
+    ​	按照文件大小切割
+
+    ​			每次记录日志之前判断当前文件大小，如果超出阈值，进行切割。
+
+    ```
+    //文件对象的类型
+    
+    func main(){
+    	fp, err := os.Open("./main.go")
+    	if err!=nil{
+    		panic(err)
+    	}
+    	fmt.Printf("%T\n", fp)
+    	//获取文件对象的详细信息
+    	fInfo, err := fp.Stat()
+    	if err != nil{
+    		panic(err)
+    	}
+    	fmt.Printf("%d\n",fInfo.Size())
+    }
+    ```
+
+    ​	按照日期切割
+
+#### 获取执行代码文件行号、文件名：
+
+```
+func f1(){
+	pc,file,line,ok := runtime.Caller(1)
+	if !ok{
+		fmt.Println("runtime.Caller() failed")
+		return 
+	}
+	//获取函数
+	funcName := runtime.FuncForPC(pc).Name()
+	fmt.Println(funcName)
+	fmt.Println(file)
+	fmt.Println(line)
+}
+func main(){
+	f1()
+}
+```
+
+
 
 ### 反射
 

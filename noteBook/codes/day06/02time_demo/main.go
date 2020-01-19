@@ -37,5 +37,12 @@ func main() {
 	fmt.Println(timeObj)
 	fmt.Println(timeObj.Unix())
 	fmt.Println(timeObj.Local().Sub(t.Local()))
+	loc, _ := time.LoadLocation("Asia/Shanghai")
+	t1, err := time.ParseInLocation("2006-01-02 15:04:05", "2020-01-19 21:13:00", loc)
+	if err != nil {
+		fmt.Println("####: ", err)
+		return
+	}
+	fmt.Println("####: ", t1)
 	timer()
 }

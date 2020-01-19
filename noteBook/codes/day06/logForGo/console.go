@@ -56,6 +56,18 @@ func NewLogForGo(level string) LogForGo {
 	}
 }
 
+//获取行号
+func getInfo(n int) (funcName, fileName string, lineNo int) {
+	pc, file, line, ok := runtime.Caller(n)
+	if !ok {
+		return
+	}
+	funcName = runtime.FuncForPC(pc).Name()
+	fileName = path.Base(file)
+	lineNo = line
+	return
+}
+
 // 要改变结构体内的字段，需要使用指针接收者
 func (l *LogForGo) SetOutput(output *os.File) {
 	l.outPut = output
@@ -76,6 +88,8 @@ func (l *LogForGo) Info(format string, elem ...interface{}) (n int, err error) {
 	if !l.enable(INFO) {
 		return
 	}
+	funcName, fileName, line := getInfo(2)
+
 	n, err = fmt.Fprintf(l.outPut, l.format(format, "info"), elem...)
 	return
 }
