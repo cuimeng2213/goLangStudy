@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -18,6 +19,7 @@ func main() {
 	fmt.Println(t.Month())
 	fmt.Println(t.Date())
 	fmt.Println(t.Hour())
+	fmt.Fprintf(os.Stdout, "==%s==\n", "hello funck")
 	// 格式化时间
 	// 将go语言中的时间对象转换为字符串类型
 	// 2019-08-03
