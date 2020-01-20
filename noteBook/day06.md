@@ -197,6 +197,12 @@ func main() {
 
     ​			每次记录日志之前判断当前文件大小，如果超出阈值，进行切割。
 
+    ​	按照日期切割：
+
+    ​		在日志结构体中设置一个时间标记
+
+    ​		写入时比较时间标记
+
     ```
     //文件对象的类型
     
@@ -240,4 +246,37 @@ func main(){
 
 
 ### 反射
+
+```
+type person struct{
+    Name string `json:name`
+    Age int `json:age`
+}
+func main(){
+    str := `{"name":"lucy","age":20}`
+    var p person
+    json.Unmarshal([]bytes(str), &p)
+    fmt.Println(p.Name, p.Age) // json包是如何反序列化的？？？
+}
+```
+
+#### reflect包
+
+​	TypeOf: 动态类型
+
+​	ValueOf: 动态值
+
+```
+func reflectType(x interface{} ){
+    v := reflect.TypeOf(x)
+    fmt.Printf("%v %v\n", v.Kind(), v.Name())
+}
+func main(){
+    var a int64
+    a = 1234
+    
+}
+```
+
+##### 结构体反射：
 

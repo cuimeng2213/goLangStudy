@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"goLangStudy/noteBook/codes/day06/logForGo"
 	"os"
+	"time"
 )
 
 func main() {
@@ -14,11 +15,14 @@ func main() {
 		return
 	}
 	logger.SetOutput(fileObj)
+	for {
+		logger.Info("=%s=\n", "这是一条测试语句")
+		logger.Debug("=%s=\n", "这是一条测试语句")
+		logger.Warning("=%s=\n", "这是一条测试语句")
+		logger.Error("=%s=\n", "这是一条测试语句")
+		logger.Fatal("=%s=\n", "这是一条测试语句")
+		time.Sleep(3 * time.Second)
+	}
 
-	logger.Info("=%s=\n", "这是一条测试语句")
-	logger.Debug("=%s=\n", "这是一条测试语句")
-	logger.Warning("=%s=\n", "这是一条测试语句")
-	logger.Error("=%s=\n", "这是一条测试语句")
-	logger.Fatal("=%s=\n", "这是一条测试语句")
 	defer fileObj.Close()
 }

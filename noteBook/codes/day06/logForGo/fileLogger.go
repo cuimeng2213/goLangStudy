@@ -1,4 +1,11 @@
-package NewFileLoger
+package logForGo
+
+import (
+	"fmt"
+	"os"
+	"path"
+	"time"
+)
 
 type FileLogger struct {
 	Level       LogLevel
@@ -15,46 +22,48 @@ func NewFileLogger(levelStr, fp, fn string, maxSize int64) *FileLogger {
 		panic(err)
 	}
 	f := &FileLogger{
-		Level:    logLevel,
-		filePath: fp,
-		fileName, fn,
+		Level:       logLevel,
+		filePath:    fp,
+		fileName:    fn,
 		maxFileSize: maxSize,
 	}
-	err := f.initFileLogger()
+	err = f.initFileLogger()
 	if err != nil {
 		panic(err)
 	}
 	return f
 }
-func (l *FileLogger) initFileLogger() error {
-	fullPath := path.join(l.filePath, l.fileName)
+
+// 初始化文件句柄
+func (f *FileLogger) initFileLogger() error {
+	fullPath := path.Join(f.filePath, f.fileName)
 	fileObj, err := os.OpenFile(fullPath, os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		fmt.Printf("open file %s failed \n", fullPath)
 		return err
 	}
-	l.fileObj = fileObj
+	f.fileObj = fileObj
 	errFilePath := fullPath + ".err"
 	errFileObj, err := os.OpenFile(errFilePath, os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		fmt.Printf("open file %s failed \n", errFilePath)
 		return err
 	}
+	f.errObj = errFileObj
 	return nil
 }
-func (l *NewFileLoger) format(format, level string) string {
+func (f *FileLogger) format(format, level, funcName, fileName string, line int) string {
 	t := time.Now().Format("2006-01-02 15:04:05")
-	format = fmt.Sprintf("[%s] %s %s", t, level, format)
-
+	format = fmt.Sprintf("[%s] [%s %s %d]%s %s", t, funcName, fileName, line, level, format)
 	return format
 }
 
-func (l *NewFileLoger) enable(level LogLevel) bool {
-	return l.Level >= level
+func (f *FileLogger) enable(level LogLevel) bool {
+	return f.Level >= level
 }
 
 //查看文件大小是否超出阈值，进行切割文件
-func (l *FileLogger) checkSize(file *os.File) bool {
+func (f *FileLogger) checkSize(file *os.File) bool {
 	fileInfo, err := file.Stat()
 	if err != nil {
 		return false
@@ -65,49 +74,42 @@ func (l *FileLogger) checkSize(file *os.File) bool {
 	return false
 }
 
-func (l *NewFileLoger) Info(format string, elem ...interface{}) (n int, err error) {
-	if !l.enable(INFO) {
+func (f *FileLogger) output(level LogLevel, format string, elem ...interface{}) {
+	if !f.enable(level) {
 		return
 	}
-	funcName, fileName, line := getInfo(2)
-
-	n, err = fmt.Fprintf(l.outPut, l.format(format, "info"), elem...)
-	return
-}
-
-func (l *NewFileLoger) Debug(format string, elem ...interface{}) (n int, err error) {
-	if !l.enable(DEBUG) {
-		return
+	funcName, fileName, line := getInfo(3)
+	fmt.Println(funcName, fileName, line)
+	format = f.format(format, getLevelName(level), funcName, fileName, line)
+	// 错误日志大于ERROR写入错误日志文件
+	if f.Level >= ERROR {
+		fmt.Fprintf(f.errObj, format, elem...)
+	} else {
+		fmt.Fprintf(f.fileObj, format, elem...)
 	}
-	n, err = fmt.Fprintf(l.outPut, l.format(format, "debug"), elem...)
-	return
 }
 
-func (l *NewFileLoger) Warning(format string, elem ...interface{}) (n int, err error) {
-	if !l.enable(WARNING) {
-		return
-	}
-	n, err = fmt.Fprintf(l.outPut, l.format(format, "warning"), elem...)
-	return
+func (f *FileLogger) Info(format string, elem ...interface{}) {
+	f.output(INFO, format, elem...)
 }
 
-func (l *NewFileLoger) Fatal(format string, elem ...interface{}) (n int, err error) {
-	if !l.enable(FATAL) {
-		return
-	}
-	n, err = fmt.Fprintf(l.outPut, l.format(format, "fatal"), elem...)
-	return
+func (f *FileLogger) Debug(format string, elem ...interface{}) {
+	f.output(DEBUG, format, elem...)
 }
 
-func (l *NewFileLoger) Error(format string, elem ...interface{}) (n int, err error) {
-	if !l.enable(ERROR) {
-		return
-	}
-	n, err = fmt.Fprintf(l.outPut, l.format(format, "error"), elem...)
-	return
+func (f *FileLogger) Warning(format string, elem ...interface{}) {
+	f.output(WARNING, format, elem...)
 }
 
-func (l *FileLogger) Close() {
-	l.fileObj.Close()
-	l.errObj.Close()
+func (f *FileLogger) Fatal(format string, elem ...interface{}) {
+	f.output(FATAL, format, elem...)
+}
+
+func (f *FileLogger) Error(format string, elem ...interface{}) {
+	f.output(ERROR, format, elem...)
+}
+
+func (f *FileLogger) Close() {
+	f.fileObj.Close()
+	f.errObj.Close()
 }
