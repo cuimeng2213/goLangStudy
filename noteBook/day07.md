@@ -68,8 +68,67 @@ database=0
 
 ### 并发
 
-### goutine
+### goutine:
 
-### channel
+#### goroutine结束时间：
+
+​	goroutine对应的函数执行结束，goroutine退出。
+
+#### 调度：需要查文档
+
+`M:N`:把M个goroutine分配给n个操作系统线程去执行
+
+goroutine初十栈的大小是2K
+
+### channel：
+
+```
+//创建channel
+var a chan int // 创建存放int类型的channel， channel是引用类型，需要申请内存空间才可以使用
+
+a = make(chan int, 100)
+fmt.Println(a)
+```
+
+##### 通道的操作：
+
+![image-20200121162003952](assets/image-20200121162003952.png)
+
+`<-`
+
+​	1.向管道写数据 `ch1 <- 1`
+
+​    2.从管道取出数据：`<-ch1`
+
+​	3.关闭通道  			`close(ch1)`
+
+关闭通道：
+
+`close(ch)`
+
+1.读已经关闭通道     不报错       能够获取通道内剩余的值，如果通道内没有值获取的值为对应类型0值
+
+单向通道：多用于函数参数中
+
+```
+func f2(ch1 chan<-, ch2 chan<-  int){
+
+}
+```
+
+
 
 ### sync
+
+```
+// sync.WaitGroup
+import (
+	"math/rand"
+)
+func f1(){
+	r1 := rand.Int()
+    r2 := rand.Intn(10)
+    fmt.Println(r1,r2)
+}
+```
+
